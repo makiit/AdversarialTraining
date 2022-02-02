@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from apex import amp
+# from apex import amp
 
 from preact_resnet import PreActResNet18
 from utils import (upper_limit, lower_limit, std, clamp, get_loaders,
@@ -34,7 +34,7 @@ def get_args():
     parser.add_argument('--out-dir', default='train_fgsm_output', type=str, help='Output directory')
     parser.add_argument('--seed', default=0, type=int, help='Random seed')
     parser.add_argument('--early-stop', action='store_true', help='Early stop if overfitting occurs')
-    parser.add_argument('--opt-level', default='O2', type=str, choices=['O0', 'O1', 'O2'],
+    parser.add_argument('--opt-level', default='O0', type=str, choices=['O0', 'O1', 'O2'],
         help='O0 is FP32 training, O1 is Mixed Precision, and O2 is "Almost FP16" Mixed Precision')
     parser.add_argument('--loss-scale', default='1.0', type=str, choices=['1.0', 'dynamic'],
         help='If loss_scale is "dynamic", adaptively adjust the loss scale over time')
