@@ -3,7 +3,7 @@ import logging
 import os
 import time
 
-# import apex.amp as amp
+import apex.amp as amp
 import numpy as np
 import torch
 import torch.nn as nn
