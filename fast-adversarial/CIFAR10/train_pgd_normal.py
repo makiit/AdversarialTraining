@@ -3,7 +3,7 @@ import logging
 import os
 import time
 
-import apex.amp as amp
+# import apex.amp as amp
 import numpy as np
 import torch
 import torch.nn as nn
@@ -72,10 +72,6 @@ def main():
     model.train()
 
     opt = torch.optim.SGD(model.parameters(), lr=args.lr_max, momentum=args.momentum, weight_decay=args.weight_decay)
-    amp_args = dict(opt_level=args.opt_level, loss_scale=args.loss_scale, verbosity=False)
-    if args.opt_level == 'O2':
-        amp_args['master_weights'] = args.master_weights
-    model, opt = amp.initialize(model, opt, **amp_args)
     criterion = nn.CrossEntropyLoss()
 
     lr_steps = args.epochs * len(train_loader)
@@ -114,8 +110,7 @@ def main():
             output = model(X + delta)
             loss = criterion(output, y)
             opt.zero_grad()
-            with amp.scale_loss(loss, opt) as scaled_loss:
-                scaled_loss.backward()
+            loss.backward()
             opt.step()
             train_loss += loss.item() * y.size(0)
             train_acc += (output.max(1)[1] == y).sum().item()
