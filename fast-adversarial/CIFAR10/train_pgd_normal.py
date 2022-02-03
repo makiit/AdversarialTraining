@@ -100,8 +100,7 @@ def main():
             for _ in range(args.attack_iters):
                 output = model(X + delta)
                 loss = criterion(output, y)
-                with amp.scale_loss(loss, opt) as scaled_loss:
-                    scaled_loss.backward()
+                loss.backward()
                 grad = delta.grad.detach()
                 delta.data = clamp(delta + alpha * torch.sign(grad), -epsilon, epsilon)
                 delta.data = clamp(delta, lower_limit - X, upper_limit - X)
