@@ -20,7 +20,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch-size', default=128, type=int)
     parser.add_argument('--data-dir', default='../../cifar-data', type=str)
-    parser.add_argument('--epochs', default=15, type=int)
+    parser.add_argument('--epochs', default=250, type=int)
     parser.add_argument('--lr-schedule', default='multistep', type=str, choices=['cyclic', 'multistep'])
     parser.add_argument('--lr-min', default=0., type=float)
     parser.add_argument('--lr-max', default=0.2, type=float)
@@ -75,6 +75,7 @@ def main():
     criterion = nn.CrossEntropyLoss()
 
     lr_steps = args.epochs * len(train_loader)
+    print(lr_steps)
     if args.lr_schedule == 'cyclic':
         scheduler = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr_min, max_lr=args.lr_max,
             step_size_up=lr_steps / 2, step_size_down=lr_steps / 2)
