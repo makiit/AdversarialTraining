@@ -135,6 +135,7 @@ def main():
     # Evaluation
 
     model_test = PreActResNet18().cuda()
+    print("Testing ",args.eval)
     if(args.eval==True):
         print("EVAL MODE")
         model = torch.load(model_test,os.path.join(args.out_dir, 'model.pth'))
