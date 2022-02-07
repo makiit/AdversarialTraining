@@ -20,7 +20,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch-size', default=128, type=int)
     parser.add_argument('--data-dir', default='../../cifar-data', type=str)
-    parser.add_argument('--epochs', default=15, type=int)
+    parser.add_argument('--epochs', default=20, type=int)
     parser.add_argument('--lr-schedule', default='cyclic', type=str, choices=['cyclic', 'multistep'])
     parser.add_argument('--lr-min', default=0., type=float)
     parser.add_argument('--lr-max', default=0.2, type=float)
@@ -32,16 +32,15 @@ def get_args():
     parser.add_argument('--alpha', default=2, type=int, help='Step size')
     parser.add_argument('--delta-init', default='random', choices=['zero', 'random'],
         help='Perturbation initialization method')
-    parser.add_argument('--out-dir', default='train_pgd_apex', type=str, help='Output direSDctory')
+    parser.add_argument('--out-dir', default='train_pgd_output', type=str, help='Output directory')
     parser.add_argument('--seed', default=0, type=int, help='Random seed')
-    parser.add_argument('--opt-level', default='O1', type=str, choices=['O0', 'O1', 'O2'],
+    parser.add_argument('--opt-level', default='O2', type=str, choices=['O0', 'O1', 'O2'],
         help='O0 is FP32 training, O1 is Mixed Precision, and O2 is "Almost FP16" Mixed Precision')
     parser.add_argument('--loss-scale', default='1.0', type=str, choices=['1.0', 'dynamic'],
         help='If loss_scale is "dynamic", adaptively adjust the loss scale over time')
     parser.add_argument('--master-weights', action='store_true',
         help='Maintain FP32 master weights to accompany any FP16 model weights, not applicable for O1 opt level')
-    parser.add_argument('--eval', default=False)
-    parser.add_argument('--checkpoint',default=None)
+    parser.add_argument('--eval',default=False)
     return parser.parse_args()
 
 
@@ -69,7 +68,6 @@ def main():
 
     epsilon = (args.epsilon / 255.) / std
     alpha = (args.alpha / 255.) / std
-    print("Mode ",args.eval)
     if(args.eval==False):
         model = PreActResNet18().cuda()
         model.train()
@@ -135,12 +133,9 @@ def main():
     # Evaluation
 
     model_test = PreActResNet18().cuda()
-    print("Testing ",args.eval)
     if(args.eval==True):
-        print("EVAL MODE")
         torch.load(model_test,os.path.join(args.out_dir, 'model.pth'))
-    # else:
-    #     model_test.load_state_dict(model.state_dict())
+    model_test.load_state_dict(model.state_dict())
     model_test.float()
     model_test.eval()
 
