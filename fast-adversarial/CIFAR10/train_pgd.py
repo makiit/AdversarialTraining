@@ -69,7 +69,7 @@ def main():
 
     epsilon = (args.epsilon / 255.) / std
     alpha = (args.alpha / 255.) / std
-
+    print("Mode ",args.eval)
     if(args.eval==False):
         model = PreActResNet18().cuda()
         model.train()
