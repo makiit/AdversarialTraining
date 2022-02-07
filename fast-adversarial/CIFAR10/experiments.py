@@ -1,6 +1,8 @@
 import os
-out_dir = "train_pgd_"
-for i in range(7,10):
-    print("Running experiments for epsilon %d"%i)
-    command = "python train_pgd.py --epsilon %d --out-dir %s"%(i,out_dir+str(i))
+out_dir = "train_pgd8_alpha_"
+alphas = [4,1,0.5]
+for a in alphas:
+    print("Running experiments for alpha %d"%a)
+    command = "python train_pgd.py --alpha %d --out-dir %s"%(a,out_dir+str(a))
+    print("Done")
     os.system(command)
