@@ -4,7 +4,9 @@ c1 = "python train_pgd.py --alpha 2 --out-dir pgd8_alpha2"
 c2 = "python train_pgd.py --alpha 4 --out-dir pgd8_alpha4"
 c3 = "python train_pgd.py --restarts 2 --out-dir pgd8_restart2" 
 c4 = "python train_pgd.py --opt-level O0 --out-dir pgd8_fp32"
-c = [c1,c2,c3,c4]
+c5 = "python train_pgd.py --epochs 20 --out-dir pgd8_epochs20"
+c6 = "python train_pgd.py --epochs 40 --out-dir pgd8_epochs40"
+c = [c3,c4,c5,c6]
 for x in c:
     print("Running ",x)
     os.system(x)
