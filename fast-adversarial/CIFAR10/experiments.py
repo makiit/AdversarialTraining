@@ -1,8 +1,12 @@
 import os
-out_dir = "train_pgd8_alpha_"
-alphas = [4,1,0.5]
-for a in alphas:
-    print("Running experiments for alpha %d"%a)
-    command = "python train_pgd.py --alpha %d --out-dir %s"%(a,out_dir+str(a))
-    print("Done")
-    os.system(command)
+import time
+c1 = "python train_pgd.py --alpha 2 --out-dir pgd8_alpha2 --epoch 20"
+c2 = "python train_pgd.py --alpha 4 --out-dir pgd8_alpha4 --epoch 20"
+c3 = "python train_pgd.py --restarts 2 --out-dir pgd8_restart2" 
+c4 = "python train_pgd.py --opt-level O0 --out-dir pgd8_fp32"
+c = [c1,c2,c3,c4]
+for x in c:
+    print("Running ",x)
+    os.system(x)
+    time.sleep(3)
+
