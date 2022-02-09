@@ -12,3 +12,6 @@ for x in c:
     os.system(x)
     time.sleep(3)
 
+# Connect to your background pod via: "kubesh makhan-6139"
+# Please remember to shut down via: "kubectl delete pod makhan-6139" ; "kubectl get pods" to list running pods.
+# You may retrieve output from your pod via: "kubectl logs makhan-6139".

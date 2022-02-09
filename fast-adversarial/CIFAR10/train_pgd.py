@@ -20,7 +20,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch-size', default=128, type=int)
     parser.add_argument('--data-dir', default='../../cifar-data', type=str)
-    parser.add_argument('--epochs', default=20, type=int)
+    parser.add_argument('--epochs', default=15, type=int)
     parser.add_argument('--lr-schedule', default='cyclic', type=str, choices=['cyclic', 'multistep'])
     parser.add_argument('--lr-min', default=0., type=float)
     parser.add_argument('--lr-max', default=0.2, type=float)
@@ -134,17 +134,4 @@ def main():
 
     model_test = PreActResNet18().cuda()
     if(args.eval==True):
-        torch.load(model_test,os.path.join(args.out_dir, 'model.pth'))
-    model_test.load_state_dict(model.state_dict())
-    model_test.float()
-    model_test.eval()
-
-    pgd_loss, pgd_acc = evaluate_pgd(test_loader, model_test, 50, 10)
-    test_loss, test_acc = evaluate_standard(test_loader, model_test)
-
-    logger.info('Test Loss \t Test Acc \t PGD Loss \t PGD Acc')
-    logger.info('%.4f \t \t %.4f \t %.4f \t %.4f', test_loss, test_acc, pgd_loss, pgd_acc)
-
-
-if __name__ == "__main__":
-    main()
+        torch.load(model_test,os.path.join(args.out_dir, 'model.pth')UCSD
