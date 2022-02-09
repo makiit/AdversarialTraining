@@ -141,7 +141,7 @@ def main():
             best_state_dict = copy.deepcopy(model.state_dict())
         if(epoch % args.test_interval==0):
             model.eval()
-            pgd_loss, pgd_acc = evaluate_pgd(test_loader, model, 50, 10)
+            pgd_loss, pgd_acc = evaluate_pgd(test_loader, model, 5, 1)
             test_loss, test_acc = evaluate_standard(test_loader, model)
             model.train()
             logger.info('Epoch \t Test Loss \t Test Acc \t PGD Loss \t PGD Acc')
