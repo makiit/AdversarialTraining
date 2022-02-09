@@ -145,7 +145,7 @@ def main():
             test_loss, test_acc = evaluate_standard(test_loader, model)
             model.train()
             logger.info('Epoch \t Test Loss \t Test Acc \t PGD Loss \t PGD Acc')
-            logger.info('%d \t %.4f \t \t %.4f \t %.4f \t %.4f',epoch test_loss, test_acc, pgd_loss, pgd_acc)
+            logger.info('%d \t %.4f \t \t %.4f \t %.4f \t %.4f',epoch,test_loss, test_acc, pgd_loss, pgd_acc)
 
         epoch_time = time.time()
         lr = scheduler.get_lr()[0]
