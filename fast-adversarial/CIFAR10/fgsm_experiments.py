@@ -7,7 +7,8 @@ c4 = "python train_fgsm.py --delta-init random --alpha 8 --out-dir FGSM_DB/rando
 c5 = "python train_fgsm.py --delta-init random  --out-dir FGSM_DB/random_init_alpha10"
 c6 = "python train_fgsm.py --delta-init random --alpha 16 --out-dir FGSM_DB/random_init_alpha16"
 c7 = "python train_fgsm.py --early-stop --delta-init random --alpha 16 --out-dir FGSM_DB/random_init_alpha16_early"
-c = [c1,c2,c3,c4,c5,c6,c7]
+c8 = "python train_fgsm.py --delta-init zero --alpha 8 --test-interval 1 --out-dir FGSM_DB/zero_init_plot"
+c = [c2,c5,c6,c7,c8,c4]
 for x in c:
     print("Running ",x)
     os.system(x)

@@ -40,6 +40,7 @@ def get_args():
         help='If loss_scale is "dynamic", adaptively adjust the loss scale over time')
     parser.add_argument('--master-weights', action='store_true',
         help='Maintain FP32 master weights to accompany any FP16 model weights, not applicable for O1 opt level')
+    parser.add_argument('--test-interval',default=10,type=int)
     return parser.parse_args()
 
 
@@ -138,6 +139,14 @@ def main():
                 break
             prev_robust_acc = robust_acc
             best_state_dict = copy.deepcopy(model.state_dict())
+        if(epoch % args.test_interval==0):
+            model.eval()
+            pgd_loss, pgd_acc = evaluate_pgd(test_loader, model, 50, 10)
+            test_loss, test_acc = evaluate_standard(test_loader, model)
+            model.train()
+            logger.info('Epoch \t Test Loss \t Test Acc \t PGD Loss \t PGD Acc')
+            logger.info('%d \t %.4f \t \t %.4f \t %.4f \t %.4f',epoch test_loss, test_acc, pgd_loss, pgd_acc)
+
         epoch_time = time.time()
         lr = scheduler.get_lr()[0]
         logger.info('%d \t %.1f \t \t %.4f \t %.4f \t %.4f',
