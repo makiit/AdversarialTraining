@@ -100,6 +100,8 @@ def main():
         train_n = 0
         for i, (X, y) in enumerate(train_loader):
             X, y = X.cuda(), y.cuda()
+            print(X.shape)
+            print(Y.shape)
             if i == 0:
                 first_batch = (X, y)
             if args.delta_init != 'previous':
