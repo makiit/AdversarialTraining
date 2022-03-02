@@ -90,7 +90,6 @@ def main():
         start_train_time = time.time()
         logger.info('Epoch \t Seconds \t LR \t \t Train Loss \t Train Acc')
         for epoch in range(args.epochs):
-            opt.zero_grad()
             start_epoch_time = time.time()
             train_loss = 0
             train_acc = 0
@@ -98,12 +97,14 @@ def main():
             for i, (X, y) in enumerate(train_loader):
                 print("Epoch %d Iteration %d"%(epoch,i))
                 X, y = X.cuda(), y.cuda()
-                delta.data = torch.zeros_like(X).cuda().data
+                delta = torch.zeros_like(X).cuda()
+                
                 if args.delta_init == 'random':
                     for i in range(len(epsilon)):
                         delta[:, i, :, :].uniform_(-epsilon[i][0][0].item(), epsilon[i][0][0].item())
                     delta.data = clamp(delta, lower_limit - X, upper_limit - X)
                 delta.requires_grad = True
+                opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 0.2)
                 output = model(X + delta)
                 loss = criterion(output, y)
                 opt.step(loss=loss)
