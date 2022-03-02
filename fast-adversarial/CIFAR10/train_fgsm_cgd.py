@@ -78,7 +78,7 @@ def main():
         #     amp_args['master_weights'] = args.master_weights
         # model, opt = amp.initialize(model, opt, **amp_args)
         criterion = nn.CrossEntropyLoss()
-        opt = BGCD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 0.2 )
+        opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 0.2 )
         lr_steps = args.epochs * len(train_loader)
         if args.lr_schedule == 'cyclic':
             scheduler = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr_min, max_lr=args.lr_max,
