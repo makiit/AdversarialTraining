@@ -71,7 +71,7 @@ def main():
     if(args.eval==False):
         model = PreActResNet18().cuda()
         model.train()
-        delta = torch.zeros([:,3,32,32], requires_grad=True)
+        delta = torch.zeros([args.batch_size,3,32,32], requires_grad=True)
         # opt = torch.optim.SGD(model.parameters(), lr=args.lr_max, momentum=args.momentum, weight_decay=args.weight_decay)
         # amp_args = dict(opt_level=args.opt_level, loss_scale=args.loss_scale, verbosity=False)
         # if args.opt_level == 'O2':
