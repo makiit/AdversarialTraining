@@ -80,11 +80,11 @@ def main():
         criterion = nn.CrossEntropyLoss()
         opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 0.2 )
         lr_steps = args.epochs * len(train_loader)
-        if args.lr_schedule == 'cyclic':
-            scheduler = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr_min, max_lr=args.lr_max,
-                step_size_up=lr_steps / 2, step_size_down=lr_steps / 2)
-        elif args.lr_schedule == 'multistep':
-            scheduler = torch.optim.lr_scheduler.MultiStepLR(opt, milestones=[lr_steps / 2, lr_steps * 3 / 4], gamma=0.1)
+        # if args.lr_schedule == 'cyclic':
+        #     scheduler = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr_min, max_lr=args.lr_max,
+        #         step_size_up=lr_steps / 2, step_size_down=lr_steps / 2)
+        # elif args.lr_schedule == 'multistep':
+        #     scheduler = torch.optim.lr_scheduler.MultiStepLR(opt, milestones=[lr_steps / 2, lr_steps * 3 / 4], gamma=0.1)
 
         # Training
         start_train_time = time.time()
@@ -109,7 +109,8 @@ def main():
                 train_loss += loss.item() * y.size(0)
                 train_acc += (output.max(1)[1] == y).sum().item()
                 train_n += y.size(0)
-                scheduler.step()
+                # scheduler.step()
+                
             epoch_time = time.time()
             lr = scheduler.get_lr()[0]
             logger.info('%d \t %.1f \t \t %.4f \t %.4f \t %.4f',
