@@ -31,7 +31,7 @@ def get_args():
     parser.add_argument('--alpha', default=10, type=float, help='Step size')
     parser.add_argument('--delta-init', default='random', choices=['zero', 'random', 'previous'],
         help='Perturbation initialization method')
-    parser.add_argument('--out-dir', default='train_fgsm_output', type=str, help='Output directory')
+    parser.add_argument('--out-dir', default='train_fgsm_output_trash', type=str, help='Output directory')
     parser.add_argument('--seed', default=0, type=int, help='Random seed')
     parser.add_argument('--early-stop', action='store_true', help='Early stop if overfitting occurs')
     parser.add_argument('--opt-level', default='O2', type=str, choices=['O0', 'O1', 'O2'],
@@ -101,6 +101,8 @@ def main():
         train_n = 0
         for i, (X, y) in enumerate(train_loader):
             X, y = X.cuda(), y.cuda()
+            print(X.shape,y.shape)
+            logger.info('X shape %s  shape %s',str(X.shape),str(y.shape))
             if i == 0:
                 first_batch = (X, y)
             if args.delta_init != 'previous':
