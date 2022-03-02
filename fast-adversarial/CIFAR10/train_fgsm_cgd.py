@@ -122,4 +122,4 @@ def main():
 
     model_test = PreActResNet18().cuda()
     if(args.eval==True):
-        torch.load(model_test,os.path.join(args.out_dir, 'model.pth
+        torch.load(model_test,os.path.join(args.out_dir, 'model.pth)
