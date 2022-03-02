@@ -96,6 +96,7 @@ def main():
             train_acc = 0
             train_n = 0
             for i, (X, y) in enumerate(train_loader):
+                print("Epoch %d Iteration %d"%(epoch,i))
                 X, y = X.cuda(), y.cuda()
                 delta.data = torch.zeros_like(X).cuda().data
                 if args.delta_init == 'random':
@@ -110,7 +111,7 @@ def main():
                 train_acc += (output.max(1)[1] == y).sum().item()
                 train_n += y.size(0)
                 # scheduler.step()
-                
+
             epoch_time = time.time()
             lr = scheduler.get_lr()[0]
             logger.info('%d \t %.1f \t \t %.4f \t %.4f \t %.4f',
