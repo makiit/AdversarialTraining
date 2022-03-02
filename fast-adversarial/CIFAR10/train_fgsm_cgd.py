@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 import time
-import CGDs
+from CGDs import ACGD, BCGD
 import apex.amp as amp
 import numpy as np
 import torch
@@ -21,7 +21,7 @@ def get_args():
     parser.add_argument('--batch-size', default=128, type=int)
     parser.add_argument('--data-dir', default='../../cifar-data', type=str)
     parser.add_argument('--epochs', default=40, type=int)
-    parser.add_argument('--lr-schedule', default='cyclic', type=str, choices=['cyclic', 'multistep'])
+    parser.add_argument('--lr-schedule', default='multistep', type=str, choices=['cyclic', 'multistep'])
     parser.add_argument('--lr-min', default=0., type=float)
     parser.add_argument('--lr-max', default=0.2, type=float)
     parser.add_argument('--weight-decay', default=5e-4, type=float)
@@ -71,13 +71,14 @@ def main():
     if(args.eval==False):
         model = PreActResNet18().cuda()
         model.train()
+        delta = torch.zeros([:,3,32,32], requires_grad=True)
         # opt = torch.optim.SGD(model.parameters(), lr=args.lr_max, momentum=args.momentum, weight_decay=args.weight_decay)
         # amp_args = dict(opt_level=args.opt_level, loss_scale=args.loss_scale, verbosity=False)
         # if args.opt_level == 'O2':
         #     amp_args['master_weights'] = args.master_weights
         # model, opt = amp.initialize(model, opt, **amp_args)
         criterion = nn.CrossEntropyLoss()
-
+        opt = BGCD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 0.2 )
         lr_steps = args.epochs * len(train_loader)
         if args.lr_schedule == 'cyclic':
             scheduler = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr_min, max_lr=args.lr_max,
@@ -89,21 +90,22 @@ def main():
         start_train_time = time.time()
         logger.info('Epoch \t Seconds \t LR \t \t Train Loss \t Train Acc')
         for epoch in range(args.epochs):
+            opt.zero_grad()
             start_epoch_time = time.time()
             train_loss = 0
             train_acc = 0
             train_n = 0
             for i, (X, y) in enumerate(train_loader):
                 X, y = X.cuda(), y.cuda()
-                delta = torch.zeros_like(X).cuda()
+                delta.data = torch.zeros_like(X).cuda().data
                 if args.delta_init == 'random':
                     for i in range(len(epsilon)):
                         delta[:, i, :, :].uniform_(-epsilon[i][0][0].item(), epsilon[i][0][0].item())
                     delta.data = clamp(delta, lower_limit - X, upper_limit - X)
                 delta.requires_grad = True
-                optimizer = CGDs.ACGD(max_param=[delta], min_params=model.parameters(), 
-                      lr_max=1e-3, lr_min=1e-3, device=device)
-                opt.step()
+                output = model(X + delta)
+                loss = criterion(output, y)
+                opt.step(loss=loss)
                 train_loss += loss.item() * y.size(0)
                 train_acc += (output.max(1)[1] == y).sum().item()
                 train_n += y.size(0)
