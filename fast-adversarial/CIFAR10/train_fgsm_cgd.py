@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch-size', default=128, type=int)
+    parser.add_argument('--batch-size', default=64, type=int)
     parser.add_argument('--data-dir', default='../../cifar-data', type=str)
     parser.add_argument('--epochs', default=40, type=int)
     parser.add_argument('--lr-schedule', default='multistep', type=str, choices=['cyclic', 'multistep'])
@@ -32,7 +32,7 @@ def get_args():
     parser.add_argument('--alpha', default=2, type=int, help='Step size')
     parser.add_argument('--delta-init', default='random', choices=['zero', 'random'],
         help='Perturbation initialization method')
-    parser.add_argument('--out-dir', default='train_pgd_output', type=str, help='Output directory')
+    parser.add_argument('--out-dir', default'CGD', type=str, help='Output directory')
     parser.add_argument('--seed', default=0, type=int, help='Random seed')
     parser.add_argument('--opt-level', default='O2', type=str, choices=['O0', 'O1', 'O2'],
         help='O0 is FP32 training, O1 is Mixed Precision, and O2 is "Almost FP16" Mixed Precision')
@@ -78,7 +78,6 @@ def main():
         #     amp_args['master_weights'] = args.master_weights
         # model, opt = amp.initialize(model, opt, **amp_args)
         criterion = nn.CrossEntropyLoss()
-        opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 0.2 )
         lr_steps = args.epochs * len(train_loader)
         # if args.lr_schedule == 'cyclic':
         #     scheduler = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr_min, max_lr=args.lr_max,
@@ -94,24 +93,30 @@ def main():
             train_loss = 0
             train_acc = 0
             train_n = 0
-            for i, (X, y) in enumerate(train_loader):
-                print("Epoch %d Iteration %d"%(epoch,i))
-                X, y = X.cuda(), y.cuda()
-                delta = torch.zeros_like(X).cuda()
-                
-                if args.delta_init == 'random':
-                    for i in range(len(epsilon)):
-                        delta[:, i, :, :].uniform_(-epsilon[i][0][0].item(), epsilon[i][0][0].item())
-                    delta.data = clamp(delta, lower_limit - X, upper_limit - X)
-                delta.requires_grad = True
-                opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 0.2)
-                output = model(X + delta)
-                loss = criterion(output, y)
-                opt.step(loss=loss)
-                train_loss += loss.item() * y.size(0)
-                train_acc += (output.max(1)[1] == y).sum().item()
-                train_n += y.size(0)
-                # scheduler.step()
+            i = 0
+            with tqdm(train_loader, unit="batch") as tepoch:
+                for X, y in tepoch:
+                    tepoch.set_description(f"Epoch {epoch}")
+                    # print("Epoch %d Iteration %d"%(epoch,i))
+                    X, y = X.cuda(), y.cuda()
+                    delta = torch.zeros_like(X).cuda()
+                    
+                    if args.delta_init == 'random':
+                        for i in range(len(epsilon)):
+                            delta[:, i, :, :].uniform_(-epsilon[i][0][0].item(), epsilon[i][0][0].item())
+                        delta.data = clamp(delta, lower_limit - X, upper_limit - X)
+                    delta.requires_grad = True
+                    opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 1)
+                    output = model(X + delta)
+                    loss = criterion(output, y)
+                    opt.step(loss=loss)
+                    train_loss += loss.item() * y.size(0)
+                    train_acc += (output.max(1)[1] == y).sum().item()
+                    train_n += y.size(0)
+                    tepoch.set_postfix(loss=loss.item(), accuracy=100. * accuracy)
+                    sleep(0.01)
+                    # scheduler.step()
+                    i+=1
 
             epoch_time = time.time()
             logger.info('%d \t %.1f \t \t %.4f \t %.4f',
