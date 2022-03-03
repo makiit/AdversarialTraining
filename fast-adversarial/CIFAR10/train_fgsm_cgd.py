@@ -96,7 +96,7 @@ def main():
             i = 0
             with tqdm(train_loader, unit="batch") as tepoch:
                 for X, y in tepoch:
-                    tepoch.set_description(f"Epoch {epoch}")
+                    tepoch.set_description("Epoch %d"%epoch)
                     # print("Epoch %d Iteration %d"%(epoch,i))
                     X, y = X.cuda(), y.cuda()
                     delta = torch.zeros_like(X).cuda()
