@@ -114,7 +114,7 @@ def main():
                     train_loss += loss.item() * y.size(0)
                     train_acc += (output.max(1)[1] == y).sum().item()
                     train_n += y.size(0)
-                    tepoch.set_postfix(loss=loss.item(), accuracy=100. * accuracy)
+                    tepoch.set_postfix(loss=loss.item(), accuracy=100. * train_acc)
                     sleep(0.01)
                     # scheduler.step()
                     i+=1
