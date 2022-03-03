@@ -113,7 +113,7 @@ def main():
                         output = model(X + delta)
                         loss = criterion(output, y)
                         opt.step(loss=loss)
-                    print(torch.shape(delta))
+                    print(delta.data.shape)
                     train_loss += loss.item() * y.size(0)
                     train_acc += (output.max(1)[1] == y).sum().item()
                     train_n += y.size(0)
