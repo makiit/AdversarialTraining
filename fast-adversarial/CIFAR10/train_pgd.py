@@ -88,12 +88,13 @@ def main():
 
         # Training
         start_train_time = time.time()
-        logger.info('Epoch \t Seconds \t LR \t \t Train Loss \t Train Acc')
+        logger.info('Epoch \t Seconds \t LR \t \t Train Loss \t Train Acc \t Mean delta norm')
         for epoch in range(args.epochs):
             start_epoch_time = time.time()
             train_loss = 0
             train_acc = 0
             train_n = 0
+            norm_delta = 0
             for i, (X, y) in enumerate(train_loader):
                 X, y = X.cuda(), y.cuda()
                 delta = torch.zeros_like(X).cuda()
@@ -112,6 +113,9 @@ def main():
                     delta.data = clamp(delta, lower_limit - X, upper_limit - X)
                     delta.grad.zero_()
                 delta = delta.detach()
+                norm_delta += torch.mean(torch.norm(delta,p=float('inf'),dim = [1,2,3])).item()
+
+
                 output = model(X + delta)
                 loss = criterion(output, y)
                 opt.zero_grad()
@@ -124,8 +128,8 @@ def main():
                 scheduler.step()
             epoch_time = time.time()
             lr = scheduler.get_lr()[0]
-            logger.info('%d \t %.1f \t \t %.4f \t %.4f \t %.4f',
-                epoch, epoch_time - start_epoch_time, lr, train_loss/train_n, train_acc/train_n)
+            logger.info('%d \t %.1f \t \t %.4f \t %.4f \t %.4f \t %.4f',
+                epoch, epoch_time - start_epoch_time, lr, train_loss/train_n, train_acc/train_n, norm_delta/train_n)
         train_time = time.time()
         torch.save(model.state_dict(), os.path.join(args.out_dir, 'model.pth'))
         logger.info('Total train time: %.4f minutes', (train_time - start_train_time)/60)
