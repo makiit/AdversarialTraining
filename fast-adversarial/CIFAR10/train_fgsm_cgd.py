@@ -32,7 +32,7 @@ def get_args():
     parser.add_argument('--alpha', default=2, type=int, help='Step size')
     parser.add_argument('--delta-init', default='random', choices=['zero', 'random'],
         help='Perturbation initialization method')
-    parser.add_argument('--out-dir', default'CGD', type=str, help='Output directory')
+    parser.add_argument('--out-dir', default='CGD', type=str, help='Output directory')
     parser.add_argument('--seed', default=0, type=int, help='Random seed')
     parser.add_argument('--opt-level', default='O2', type=str, choices=['O0', 'O1', 'O2'],
         help='O0 is FP32 training, O1 is Mixed Precision, and O2 is "Almost FP16" Mixed Precision')
