@@ -109,7 +109,7 @@ def main():
                             delta[:, i, :, :].uniform_(-epsilon[i][0][0].item(), epsilon[i][0][0].item())
                         delta.data = clamp(delta, lower_limit - X, upper_limit - X)
                     delta.requires_grad = True
-                    opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 1)
+                    opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 2)
                     for ci in range(args.cgd_iter):
                         output = model(X + delta)
                         loss = criterion(output, y)
