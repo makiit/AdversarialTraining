@@ -89,11 +89,12 @@ def main():
 
         # Training
         start_train_time = time.time()
-        logger.info('Epoch \t Seconds \t LR \t \t Train Loss \t Train Acc')
+        logger.info('Epoch \t Seconds \t LR \t \t Train Loss \t Train Acc \t Delta norm')
         for epoch in range(args.epochs):
             start_epoch_time = time.time()
             train_loss = 0
             train_acc = 0
+            norm_delta = 0
             train_n = 0
             i = 0
             with tqdm(train_loader, unit="batch") as tepoch:
@@ -113,9 +114,11 @@ def main():
                         output = model(X + delta)
                         loss = criterion(output, y)
                         opt.step(loss=loss)
-                    print(torch.norm(delta,p=float('inf'),dim = [1,2,3]))
+                        delta.data = clamp(delta, -epsilon, epsilon)
+                        delta.data = clamp(delta, lower_limit - X, upper_limit - X)
                     train_loss += loss.item() * y.size(0)
                     train_acc += (output.max(1)[1] == y).sum().item()
+                    norm_delta += torch.mean(torch.norm(delta,p=float('inf'),dim = [1,2,3])).item()
                     train_n += y.size(0)
 
                     tepoch.set_postfix(loss=loss.item()/train_n, accuracy=100. * train_acc/train_n)
@@ -124,14 +127,14 @@ def main():
                     i+=1
             if(epoch % args.test_interval==0):
                 model.eval()
-                pgd_loss, pgd_acc = evaluate_pgd(test_loader, model, 5, 1)
+                pgd_loss, pgd_acc = evaluate_pgd(test_loader, model, 25, 10)
                 test_loss, test_acc = evaluate_standard(test_loader, model)
                 model.train()
                 logger.info('Epoch \t Test Loss \t Test Acc \t PGD Loss \t PGD Acc')
                 logger.info('%d \t %.4f \t \t %.4f \t %.4f \t %.4f',epoch,test_loss, test_acc, pgd_loss, pgd_acc)
             epoch_time = time.time()
             logger.info('%d \t %.1f \t \t %.4f \t %.4f',
-                epoch, epoch_time - start_epoch_time,train_loss/train_n, train_acc/train_n)
+                epoch, epoch_time - start_epoch_time,train_loss/train_n, train_acc/train_n,norm_delta/train_n)
         train_time = time.time()
         torch.save(model.state_dict(), os.path.join(args.out_dir, 'model.pth'))
         logger.info('Total train time: %.4f minutes', (train_time - start_train_time)/60)
