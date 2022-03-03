@@ -42,7 +42,7 @@ def get_args():
     parser.add_argument('--master-weights', action='store_true',
         help='Maintain FP32 master weights to accompany any FP16 model weights, not applicable for O1 opt level')
     parser.add_argument('--eval',default=False)
-    parser.add_argument('--test-interval',default=3,type=int)
+    parser.add_argument('--test-interval',default=10,type=int)
     return parser.parse_args()
 
 
@@ -115,18 +115,11 @@ def main():
                     train_loss += loss.item() * y.size(0)
                     train_acc += (output.max(1)[1] == y).sum().item()
                     train_n += y.size(0)
-
                     tepoch.set_postfix(loss=loss.item()/train_n, accuracy=100. * train_acc/train_n)
                     # sleep(0.01)
                     # scheduler.step()
                     i+=1
-            if(epoch % args.test_interval==0):
-                model.eval()
-                pgd_loss, pgd_acc = evaluate_pgd(test_loader, model, 5, 1)
-                test_loss, test_acc = evaluate_standard(test_loader, model)
-                model.train()
-                logger.info('Epoch \t Test Loss \t Test Acc \t PGD Loss \t PGD Acc')
-                logger.info('%d \t %.4f \t \t %.4f \t %.4f \t %.4f',epoch,test_loss, test_acc, pgd_loss, pgd_acc)
+
             epoch_time = time.time()
             logger.info('%d \t %.1f \t \t %.4f \t %.4f',
                 epoch, epoch_time - start_epoch_time,train_loss/train_n, train_acc/train_n)
