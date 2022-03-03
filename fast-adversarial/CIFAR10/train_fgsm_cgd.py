@@ -7,6 +7,7 @@ import apex.amp as amp
 import numpy as np
 import torch
 import torch.nn as nn
+from tqdm import tqdm
 import torch.nn.functional as F
 
 from preact_resnet import PreActResNet18
