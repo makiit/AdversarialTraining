@@ -28,7 +28,7 @@ def get_args():
     parser.add_argument('--weight-decay', default=5e-4, type=float)
     parser.add_argument('--momentum', default=0.9, type=float)
     parser.add_argument('--epsilon', default=8, type=int)
-    parser.add_argument('--attack-iters', default=7, type=int, help='Attack iterations')
+    parser.add_argument('--cgd-iter', default=3, type=int, help='Attack iterations')
     parser.add_argument('--restarts', default=1, type=int)
     parser.add_argument('--alpha', default=2, type=int, help='Step size')
     parser.add_argument('--delta-init', default='random', choices=['zero', 'random'],
@@ -109,9 +109,10 @@ def main():
                         delta.data = clamp(delta, lower_limit - X, upper_limit - X)
                     delta.requires_grad = True
                     opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 1)
-                    output = model(X + delta)
-                    loss = criterion(output, y)
-                    opt.step(loss=loss)
+                    for ci in range(args.cgd_iter):
+                        output = model(X + delta)
+                        loss = criterion(output, y)
+                        opt.step(loss=loss)
                     train_loss += loss.item() * y.size(0)
                     train_acc += (output.max(1)[1] == y).sum().item()
                     train_n += y.size(0)
