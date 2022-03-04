@@ -133,7 +133,7 @@ def main():
                 logger.info('Epoch \t Test Loss \t Test Acc \t PGD Loss \t PGD Acc')
                 logger.info('%d \t %.4f \t \t %.4f \t %.4f \t %.4f',epoch,test_loss, test_acc, pgd_loss, pgd_acc)
             epoch_time = time.time()
-            logger.info('%d \t %.1f \t \t %.4f \t %.4f',
+            logger.info('%d \t %.1f \t \t %.4f \t %.4f \t %.4f',
                 epoch, epoch_time - start_epoch_time,train_loss/train_n, train_acc/train_n,norm_delta/train_n)
         train_time = time.time()
         torch.save(model.state_dict(), os.path.join(args.out_dir, 'model.pth'))
