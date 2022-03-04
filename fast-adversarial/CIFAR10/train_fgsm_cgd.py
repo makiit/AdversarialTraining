@@ -125,7 +125,7 @@ def main():
                     # sleep(0.01)
                     # scheduler.step()
                     i+=1
-            if(epoch % args.test_interval==0):
+            if(epoch % args.test_interval==0 and epoch>0):
                 model.eval()
                 pgd_loss, pgd_acc = evaluate_pgd(test_loader, model, 25, 10)
                 test_loss, test_acc = evaluate_standard(test_loader, model)
