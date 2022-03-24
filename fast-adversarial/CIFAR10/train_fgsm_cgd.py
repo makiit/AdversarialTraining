@@ -28,12 +28,12 @@ def get_args():
     parser.add_argument('--weight-decay', default=5e-4, type=float)
     parser.add_argument('--momentum', default=0.9, type=float)
     parser.add_argument('--epsilon', default=8, type=int)
-    parser.add_argument('--cgd-iter', default=3, type=int, help='Attack iterations')
+    parser.add_argument('--cgd-iter', default=1, type=int, help='Attack iterations')
     parser.add_argument('--restarts', default=1, type=int)
     parser.add_argument('--alpha', default=2, type=int, help='Step size')
     parser.add_argument('--delta-init', default='random', choices=['zero', 'random'],
         help='Perturbation initialization method')
-    parser.add_argument('--out-dir', default='CGD', type=str, help='Output directory')
+    parser.add_argument('--out-dir', default='CGD3', type=str, help='Output directory')
     parser.add_argument('--seed', default=0, type=int, help='Random seed')
     parser.add_argument('--opt-level', default='O2', type=str, choices=['O0', 'O1', 'O2'],
         help='O0 is FP32 training, O1 is Mixed Precision, and O2 is "Almost FP16" Mixed Precision')
@@ -109,7 +109,7 @@ def main():
                             delta[:, i, :, :].uniform_(-epsilon[i][0][0].item(), epsilon[i][0][0].item())
                         delta.data = clamp(delta, lower_limit - X, upper_limit - X)
                     delta.requires_grad = True
-                    opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 1,lr_min = 2)
+                    opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 0.2,lr_min = 0.2)
                     for ci in range(args.cgd_iter):
                         output = model(X + delta)
                         loss = criterion(output, y)
