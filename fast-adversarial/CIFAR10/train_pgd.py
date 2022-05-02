@@ -128,17 +128,26 @@ def main():
                 scheduler.step()
             epoch_time = time.time()
             lr = scheduler.get_lr()[0]
+            torch.save(model.state_dict(), os.path.join(args.out_dir, 'model_epoch_%d.pth'%epoch))
             logger.info('%d \t %.1f \t \t %.4f \t %.4f \t %.4f \t %.4f',
                 epoch, epoch_time - start_epoch_time, lr, train_loss/train_n, train_acc/train_n, norm_delta/train_n)
         train_time = time.time()
-        torch.save(model.state_dict(), os.path.join(args.out_dir, 'model_epoch_%d.pth'%epoch))
+        
         logger.info('Total train time: %.4f minutes', (train_time - start_train_time)/60)
 
     # Evaluation
+    model_test.load_state_dict(model.state_dict())
+    model_test.float()
+    model_test.eval()
 
-    model_test = PreActResNet18().cuda()
-    if(args.eval==True):
-        torch.load(model_test,os.path.join(args.out_dir, 'model.pth'))
+    pgd_loss, pgd_acc = evaluate_pgd(test_loader, model_test, 50, 10)
+    test_loss, test_acc = evaluate_standard(test_loader, model_test)
+
+    logger.info('Test Loss \t Test Acc \t PGD Loss \t PGD Acc')
+    logger.info('%.4f \t \t %.4f \t %.4f \t %.4f', test_loss, test_acc, pgd_loss, pgd_acc)
+    # model_test = PreActResNet18().cuda()
+    # if(args.eval==True):
+    #     torch.load(model_test,os.path.join(args.out_dir, 'model_epoch_1.pth'))
 
 
 
