@@ -136,6 +136,7 @@ def main():
         logger.info('Total train time: %.4f minutes', (train_time - start_train_time)/60)
 
     # Evaluation
+    model_test = PreActResNet18().cuda()
     model_test.load_state_dict(model.state_dict())
     model_test.float()
     model_test.eval()
