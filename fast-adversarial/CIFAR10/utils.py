@@ -52,6 +52,23 @@ def get_loaders(dir_, batch_size):
     return train_loader, test_loader
 
 
+def attack_cgd(model,X,y,epsilon,save=False):
+    X, y = X.cuda(), y.cuda()
+    delta = torch.zeros_like(X).cuda()
+    
+    if args.delta_init == 'random':
+        for i in range(len(epsilon)):
+            delta[:, i, :, :].uniform_(-epsilon[i][0][0].item(), epsilon[i][0][0].item())
+        delta.data = clamp(delta, lower_limit - X, upper_limit - X)
+    delta.requires_grad = True
+    opt = BCGD(max_params=[delta],min_params=model.parameters(),lr_max = 0.2,lr_min = 0.2)
+    for ci in range(args.cgd_iter):
+        output = model(X + delta)
+        loss = criterion(output, y)
+        opt.step(loss=loss)
+        delta.data = clamp(delta, -epsilon, epsilon)
+        delta.data = clamp(delta, lower_limit - X, upper_limit - X)
+
 def attack_pgd(model, X, y, epsilon, alpha, attack_iters, restarts, opt=None):
     max_loss = torch.zeros(y.shape[0]).cuda()
     max_delta = torch.zeros_like(X).cuda()
