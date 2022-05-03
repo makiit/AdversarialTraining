@@ -75,7 +75,7 @@ def main():
     lr_steps = args.epochs * len(train_loader)
     print(lr_steps)
     
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=200)
 
     # Training
     start_train_time = time.time()
