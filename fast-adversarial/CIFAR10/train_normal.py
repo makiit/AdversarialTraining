@@ -102,17 +102,18 @@ def main():
         lr = scheduler.get_lr()[0]
         logger.info('%d \t %.1f \t \t %.4f \t %.4f \t %.4f',
             epoch, epoch_time - start_epoch_time, lr, train_loss/train_n, train_acc/train_n)
-    train_time = time.time()
-    torch.save(model.state_dict(), os.path.join(args.out_dir, 'model_epoch_%d.pth')%epoch)
-    logger.info('Total train time: %.4f minutes', (train_time - start_train_time)/60)
-    test_loss, test_acc = evaluate_standard(test_loader, model_test)
-    logger.info('Test Loss \t Test Acc ')
-    logger.info('%.4f \t \t %.4f ', test_loss, test_acc)
+        train_time = time.time()
+        torch.save(model.state_dict(), os.path.join(args.out_dir, 'model_epoch_%d.pth')%epoch)
+        logger.info('Total train time: %.4f minutes', (train_time - start_train_time)/60)
+        model_test = PreActResNet18().cuda()
+        model_test.load_state_dict(model.state_dict())
+        model_test.float()
+        model_test.eval()
+        test_loss, test_acc = evaluate_standard(test_loader, model_test)
+        logger.info('Test Loss \t Test Acc ')
+        logger.info('%.4f \t \t %.4f ', test_loss, test_acc)
     # Evaluation
-    model_test = PreActResNet18().cuda()
-    model_test.load_state_dict(model.state_dict())
-    model_test.float()
-    model_test.eval()
+    
 
 if __name__ == "__main__":
     main()
