@@ -108,7 +108,7 @@ def main():
         model_test.float()
         model_test.eval()
         test_loss, test_acc = evaluate_standard(test_loader, model_test)
-        print("Epoch %d Test accuracy %f"%epoch,test_acc)
+        print("Epoch %d Test accuracy %f"%(epoch,test_acc))
         logger.info('Test Loss \t Test Acc ')
         logger.info('%.4f \t \t %.4f ', test_loss, test_acc)
     # Evaluation
