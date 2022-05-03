@@ -89,7 +89,7 @@ def main():
         train_n = 0
         for i, (X, y) in enumerate(train_loader):
             X, y = X.cuda(), y.cuda()
-            output = model(X + delta)
+            output = model(X)
             loss = criterion(output, y)
             opt.zero_grad()
             loss.backward()
