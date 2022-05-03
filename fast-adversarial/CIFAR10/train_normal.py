@@ -68,16 +68,14 @@ def main():
     model = PreActResNet18().cuda()
     model.train()
 
-    opt = torch.optim.SGD(model.parameters(), lr=args.lr_max, momentum=args.momentum, weight_decay=args.weight_decay)
+    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr,
+                      momentum=0.9, weight_decay=5e-4)
     criterion = nn.CrossEntropyLoss()
 
     lr_steps = args.epochs * len(train_loader)
     print(lr_steps)
-    if args.lr_schedule == 'cyclic':
-        scheduler = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr_min, max_lr=args.lr_max,
-            step_size_up=lr_steps / 2, step_size_down=lr_steps / 2)
-    elif args.lr_schedule == 'multistep':
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(opt, milestones=[lr_steps / 2, lr_steps * 3 / 4], gamma=0.1)
+    
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 
     # Training
     start_train_time = time.time()
@@ -110,6 +108,7 @@ def main():
         model_test.float()
         model_test.eval()
         test_loss, test_acc = evaluate_standard(test_loader, model_test)
+        print("Epoch %d Test accuracy %f"%epoch,test_acc)
         logger.info('Test Loss \t Test Acc ')
         logger.info('%.4f \t \t %.4f ', test_loss, test_acc)
     # Evaluation
