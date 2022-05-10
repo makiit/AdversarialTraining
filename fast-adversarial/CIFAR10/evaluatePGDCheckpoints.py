@@ -70,7 +70,7 @@ def main():
         
 
         state_dict = model_test.state_dict()
-        for k in ckpt_copy:
+        for k in ckpt:
             if(k not in state_dict):
                 del ckpt[k]
         model_test.load_state_dict(ckpt)
