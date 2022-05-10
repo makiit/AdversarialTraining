@@ -82,3 +82,9 @@ def main():
 
         logger.info('Checkpoint \t Test Loss \t Test Acc \t PGD Loss \t PGD Acc')
         logger.info('%s \t %.4f \t \t %.4f \t %.4f \t %.4f',cpt, test_loss, test_acc, pgd_loss, pgd_acc)
+
+
+
+
+if __name__ == "__main__":
+    main()
