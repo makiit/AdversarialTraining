@@ -79,7 +79,7 @@ def main():
 
         pgd_loss, pgd_acc = evaluate_pgd(test_loader, model_test, 50, 10)
         test_loss, test_acc = evaluate_standard(test_loader, model_test)
-        print("Checkpoint %s PGD Accuracy %f"%cpt,pgd_acc)
+        print("Checkpoint %s PGD Accuracy %f"%(cpt,pgd_acc))
         logger.info('Checkpoint \t Test Loss \t Test Acc \t PGD Loss \t PGD Acc')
         logger.info('%s \t %.4f \t \t %.4f \t %.4f \t %.4f',cpt, test_loss, test_acc, pgd_loss, pgd_acc)
 
