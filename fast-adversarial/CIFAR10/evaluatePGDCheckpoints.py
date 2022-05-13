@@ -64,7 +64,7 @@ def main():
 
     for i in range(len(cpts)):
         cpt = cpts[i]
-        epoch = getEpoch(s)
+        epoch = getEpoch(cpt)
         print(epoch)
         if(epoch%5!=0 or epoch<8):
             continue
