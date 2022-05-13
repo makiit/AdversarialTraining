@@ -62,7 +62,12 @@ def main():
     cpts=sorted(cpts, key=cmp_to_key(compare))
     cpts = [args.root+x for x in cpts]
 
-    for cpt in cpts:
+    for i in range(len(cpts)):
+        cpt = cpts[i]
+        epoch = getEpoch(s)
+        print(epoch)
+        if(epoch%5!=0 or epoch<8):
+            continue
         ckpt = torch.load(cpt)
 
         train_loader, test_loader = get_loaders(args.data_dir, args.batch_size)
